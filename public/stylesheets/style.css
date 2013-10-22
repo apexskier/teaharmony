@@ -1,0 +1,27 @@
+h1.navbar-brand {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.page-2 {
+    display: none;
+}
+#hnypt, .hnypt {
+    display: none;
+}
+
+.label a,
+a.label {
+    color: #fff;
+    cursor: pointer;
+}
+.label a:focus,
+.label a:hover,
+a.label:focus,
+a.label:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+h2 ~ .jumbotron {
+    margin-top: 15px;
+}

@@ -1,0 +1,35 @@
+extends layout
+
+block content
+    if user
+        .row
+            .col-sm-8.col-sm-offset-2.text-center
+                a#have.btn.btn-primary(href="have") I have something
+                | &nbsp;
+                a#want.btn.btn-primary(href="want") I'm looking for something
+
+    h2.text-center: .form-group
+        - var active_type = terms.second[type] || terms.second.any
+        - var active_trade = trades[trade] || trades.any
+        .p People who&nbsp;
+            .btn-group.text-left
+                button.btn.btn-default.dropdown-toggle(data-toggle="dropdown")= active_type + ' '
+                    span.caret
+                ul.dropdown-menu(role="menu")
+                    li: a(href="/list/have/#{trade}")= terms.second.have
+                    li: a(href="/list/want/#{trade}")= terms.second.want
+                    li: a(href="/list/any/#{trade}")= terms.second.any
+            | &nbsp;
+            .btn-group.text-left
+                button.btn.btn-default.dropdown-toggle(data-toggle="dropdown")= active_trade + ' '
+                    span.caret
+                ul.dropdown-menu(role="menu")
+                    li: a(href="/list/#{type}/scoby")= trades.scoby
+                    li: a(href="/list/#{type}/kefir")= trades.kefir
+                    li: a(href="/list/#{type}")= trades.any
+            | .
+
+    br
+
+    .col-md-8.col-md-offset-2
+        +items

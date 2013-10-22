@@ -1,0 +1,74 @@
+mixin trade(code)
+    span.label.label-primary: a(href="/#{code}")= trades[code]
+
+mixin person(name, id)
+    - var url = '/contact/' + name + ((id) ? '/' + id : '')
+    if user && user.name == name
+        span.label.label-default: a(href="#{url}")= name
+    else
+        span.label.label-info: a(href="#{url}")= name
+
+mixin items(none_message)
+    if items && items.length > 0
+        - for (i in items)
+            - var item = items[i]
+            p.lead
+                +person(item.user, item._id)
+                |  #{terms[item.type]}&nbsp;
+                +trade(item.what)
+                | .&nbsp;
+                if user
+                    small
+                        - var url = '/contact/' + name + ((id) ? '/' + id : '')
+                        unless user.name == name
+                            a.btn.btn-info.btn-xs(href="#{url}") contact
+                            | &nbsp;
+                        if user && user.roles[0] == "admin"
+                            a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete
+    else
+        p.lead!= none_message
+
+doctype 5
+html
+    head
+        title= title + ' #1 Trusted Brewing Online Exchange Site'
+        meta(name="viewport" content="width=device-width, user-scalable=false;")
+        link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
+        link(rel='stylesheet', href='/stylesheets/style.css')
+    body
+        .container
+            .navbar
+                a(href="/list")
+                    h1.navbar-brand= title
+                .navbar-right.pull-right
+                    if user
+                        p.navbar-text.hidden-xs Welcome,&nbsp;
+                            span.text-info: a(href="/user")= user.name
+                        .btn-group
+                            unless path == '/matches'
+                                a.btn.btn-primary.navbar-btn(href="/matches") Your matches
+                            else
+                                a.btn.btn-primary.navbar-btn(href="/list") All
+                            a#logout.btn.btn-default.navbar-btn(href="/logout") Log Out
+                    else
+                        p.navbar-text.hidden-xs Already a member?
+                        .btn-group
+                            unless path == '/'
+                                a.btn.btn-default.navbar-btn(href="/") Register
+                            a#login.btn.btn-default.navbar-btn(href="/login") Log In
+
+            if messages
+                - for (i in messages)
+                - var message = messages[i]
+                    if message.type
+                        .alert(class="alert-#{message.type}")
+                            p= message.content
+                    else
+                        .alert.alert-warning
+                            p= message
+
+            block content
+
+            script(src="http://code.jquery.com/jquery-1.10.1.min.js")
+            script(src='/javascripts/bootstrap.min.js')
+            script(src='/javascripts/script.js')

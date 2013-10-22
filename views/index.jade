@@ -1,0 +1,52 @@
+extends layout
+
+block content
+    h2.text-center Welcome to #{title}
+
+    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
+        form#signup(role="form", method="post", action="/register")
+            .page-1
+                .form-group
+                    label.sr-only(for="username", class="sr-only") Name
+                    input#name.form-control.input-lg(type="text", name="username", placeholder="Hi, what's your username?", required)
+
+                .row
+                    .col-sm-6
+                        .form-group
+                            label(for="have") I have:
+                            select.form-control.input-lg(name="have", required)
+                                option(value="null") Choose One
+                                option(value="null") nothing but love
+                                - for (trade in trades)
+                                    p test
+                                    option(value="#{trade}")= trades[trade]
+
+                    .col-sm-6
+                        .form-group
+                            label(for="want") I'm seeking:
+                            select.form-control.input-lg(name="want", required)
+                                option(value="null") Choose One
+                                option(value="null") nothing but love
+                                - for (trade in trades)
+                                    p test
+                                    option(value="#{trade}")= trades[trade]
+
+                .row
+                    .col-sm-8.col-sm-offset-2
+                        button#next.btn.btn-primary.btn-lg.btn-block(type="button") Let's go
+
+            .page-2
+                .form-group
+                    label.sr-only(for="email") Email
+                    input#email.form-control.input-lg(type="email", name="email", placeholder="Your email?", required)
+
+                .form-group
+                    label.sr-only(for="password") Password
+                    input#password.form-control.input-lg(type="password", name="password", placeholder="Create your password")
+
+                .hidden
+                    input#hnypt(type="text", name="hnypt")
+
+                .form-group.text-center
+                    a#back.btn.btn-link.btn-lg ‹ Go Back
+                    input#finish.btn.btn-primary.btn-lg(type="submit", Value="Find my matches")

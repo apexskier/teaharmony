@@ -1,0 +1,4 @@
+private.js
+*.swp
+*.un~
+node_modules

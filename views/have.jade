@@ -1,0 +1,18 @@
+extends layout
+
+block content
+    h2.text-center I have something to share
+
+    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
+        form#update(role="form", method="post", action="/have")
+            .form-group
+                label(for="have") I have:
+                select.form-control.input-lg(name="have", required)
+                    option(value="null") Choose One
+                    - for (trade in trades)
+                        p test
+                        option(value="#{trade}")= trades[trade]
+
+            .row
+                .col-sm-8.col-sm-offset-2
+                    button.btn.btn-primary.btn-lg.btn-block(type="submit") Submit

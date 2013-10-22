@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    .row
+        .col-sm-8.col-sm-offset-2.text-center
+            a#have.btn.btn-primary(href="have") I have something
+            | &nbsp;
+            a#want.btn.btn-primary(href="want") I'm looking for something
+
+    h2.text-center Your matches
+
+    br
+
+    .col-md-8.col-md-offset-2
+        +items('You have no matches, let people know you <a href="/have">have something</a> or are <a href="/want">looking</a>.')
