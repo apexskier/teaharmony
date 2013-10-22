@@ -1,7 +1,13 @@
-### Using
+# TeaHarmony
+
+A website for exchanging brewing supplies that can be hard to get ahold of.
+
+## Technical specifics
+
+### This project uses
 
 - [node.js](http://nodejs.org) - server
-- [express]http://expressjs.com/) - web application framework
+- [express](http://expressjs.com/) - web application framework
 - [CouchDB](http://couchdb.apache.org) - database
 - [Passport](http://passportjs.org) - authentication
 - [Jade](http://jade-lang.com) - templating
