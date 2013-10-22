@@ -1,6 +1,6 @@
 # TeaHarmony
 
-A website for exchanging brewing supplies that can be hard to get ahold of.
+A website for exchanging brewing supplies that can be hard to get a hold of.
 
 ## Technical specifics
 
