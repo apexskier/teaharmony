@@ -49,9 +49,9 @@ var site = {
         want: "is looking for",
         any: "has or want",
         second: {
-            have: 'are offering',
-            want: 'are looking for',
-            any: 'have or want'
+            have: "are offering",
+            want: "are looking for",
+            any: "have or want"
         }
     },
     ctx: function(req) {
@@ -72,6 +72,10 @@ var site = {
     email_re: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     validEmail: function(email) {
         return site.email_re.test(email);
+    },
+    username_re: /^([a-zA-Z0-9]((_|-| )[a-zA-Z0-9])?)*$/,
+    validUsername: function(name) {
+        return (site.username_re.test(name) && (name.length <= 16) && (name.length >= 4));
     }
 }
 
@@ -167,7 +171,7 @@ app.get('/', function(req, res) {
 app.get('/login', function(req, res) {
     if (req.user) {
         req.flash('message', 'Already logged in');
-        res.redirect(site.home_dir);
+        res.redirect('/next');
     } else {
         var errors = req.flash('error');
         _.each(errors, function(error) {
@@ -177,10 +181,18 @@ app.get('/login', function(req, res) {
     }
 });
 app.post('/login', passport.authenticate('local', {
-    successRedirect: site.home_dir,
+    successRedirect: '/next',
     failureRedirect: '/login',
     failureFlash: true
 }));
+app.get('/next', function(req, res) {
+    var next_page = _.last(req.flash('next_page'));
+    if (next_page) {
+        res.redirect(next_page);
+    } else {
+        res.redirect(site.home_dir);
+    }
+});
 app.post('/register', function(req, res) {
     var user = req.body;
     user.name = user.username;
@@ -192,94 +204,103 @@ app.post('/register', function(req, res) {
             req.flash('message', 'Invalid email given.');
             res.redirect('back');
         } else {
-            usersdb.view('general', 'names', { keys: [user.name] }, function(err, body) {
-                if (!err) {
-                    if (body.rows.length > 0) {
-                        passport.authenticate('local', function(err, user, info) {
-                            if (err) {
-                                req.flash('message', 'Something went wrong: ' + err);
-                                return res.redirect('/');
-                            } else if (!user) {
-                                req.flash('message', 'The username ' + req.body.name + ' has been taken already.');
-                                res.redirect('/');
-                            } else {
-                                req.login(user, function(err) {
-                                    if (err) {
-                                        console.log(err);
-                                        req.flash('message', 'Something went wrong: ' + err);
-                                        return res.redirect('/');
-                                    }
-                                    req.flash('message', { type: 'success', content: 'You already have an account and have been logged in.' });
-                                    res.redirect(site.home_dir);
-                                });
-                            }
-                        })(req, res);
-                        /*passport.authenticate('local', {
-                            successRedirect: site.home_dir,
-                            successFlash: 'You already have an account and have been logged in.',
-                            failureRedirect: '/',
-                            failureFlash: 'The username ' + user.name + ' has been taken already.'
-                        });*/
-                    } else {
-                        usersdb.insert(user, 'org.couchdb.user:' + user.name, function(err, body) {
-                            var fail = function(err, to) {
-                                console.log(err);
-                                req.flash('message', { type: 'danger', content: err });
-                                res.redirect(to);
-                            };
-                            if (!err) {
-                                if (body.error) {
-                                    fail(body.error, body.error + body.description);
+            if (!site.validUsername(user.name)) {
+                req.flash('message', 'Invalid username. Username may contain only letters, numbers, spaces, underscores, and dashes and must be between 4 and 16 characters long.');
+                res.redirect('back');
+            } else {
+                usersdb.view('general', 'names', { keys: [user.name] }, function(err, body) {
+                    if (!err) {
+                        if (body.rows.length > 0) {
+                            passport.authenticate('local', function(err, user, info) {
+                                if (err) {
+                                    req.flash('message', 'Something went wrong: ' + err);
+                                    return res.redirect('/');
+                                } else if (!user) {
+                                    req.flash('message', 'The username ' + req.body.name + ' has been taken already.');
+                                    res.redirect('/');
                                 } else {
-                                    if (user.have && user.have != 'null') {
-                                        db.insert({
-                                            user: user.name,
-                                            have: user.have,
-                                            date: new Date()
-                                        }, function(err, body) {
-                                            console.log(err);
-                                            if (err) {
-                                                fail(err, '/list')
-                                            } else {
-                                                return;
-                                            }
-                                        });
-                                    }
-                                    if (user.want && user.want != 'null') {
-                                        db.insert({
-                                            user: user.name,
-                                            want: user.want,
-                                            date: new Date()
-                                        }, function(err, body) {
-                                            if (err) {
-                                                fail(err, '/list')
-                                            } else {
-                                                return;
-                                            }
-                                        });
-                                    }
                                     req.login(user, function(err) {
                                         if (err) {
-                                            fail(err, '/list');
+                                            console.log(err);
+                                            req.flash('message', 'Something went wrong: ' + err);
+                                            return res.redirect('/');
                                         }
-                                    });
-                                    passport.authenticate('local')(req, res, function(err) {
+                                        req.flash('message', { type: 'success', content: 'You already have an account and have been logged in.' });
                                         res.redirect(site.home_dir);
                                     });
                                 }
-                            } else {
-                                if (err.status_code == 409) {
+                            })(req, res);
+                        } else {
+                            usersdb.insert(user, 'org.couchdb.user:' + user.name, function(err, body) {
+                                var fail = function(err, to) {
+                                    console.log(err);
+                                    req.flash('message', { type: 'danger', content: err });
+                                    res.redirect(to);
+                                };
+                                if (!err) {
+                                    var message = {
+                                        to: user.email,
+                                        subject: 'TeaHarmony registration',
+                                        text: 'You\'ve created account at TeaHarmony!\n' +
+                                              'Your username is "' + user.name + '".' + '\n\n' +
+                                              'Sign in to view your matches today at ' + site.url + '/login.\n\n' +
+                                              'Thanks for joining!'
+                                    };
+                                    emailTransport.sendMail(message);
+                                    if (body.error) {
+                                        fail(body.error, body.error + body.description);
+                                    } else {
+                                        if (user.have && user.have != 'null') {
+                                            db.insert({
+                                                user: user.name,
+                                                have: user.have,
+                                                date: new Date()
+                                            }, function(err, body) {
+                                                console.log(err);
+                                                if (err) {
+                                                    fail(err, '/list')
+                                                } else {
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                        if (user.want && user.want != 'null') {
+                                            db.insert({
+                                                user: user.name,
+                                                want: user.want,
+                                                date: new Date()
+                                            }, function(err, body) {
+                                                if (err) {
+                                                    fail(err, '/list')
+                                                } else {
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                        req.login(user, function(err) {
+                                            if (err) {
+                                                fail(err, '/list');
+                                            }
+                                        });
+                                        passport.authenticate('local')(req, res, function(err) {
+                                            req.flash('message', { type: 'success', content: 'Welcome to TeaHarmony!' });
+                                            res.redirect(site.home_dir);
+                                        });
+                                    }
                                 } else {
-                                    fail(err.status_code + ": " + err.description, '/register');
+                                    if (err.status_code == 409) {
+                                    } else {
+                                        fail(err.status_code + ": " + err.description, '/register');
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                    } else {
+                        req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
+                        res.redirect('back');
                     }
-                } else {
-                    req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                    res.redirect('back');
-                }
-            });
+                });
+            }
         }
     } else {
         res.status(500);
@@ -469,18 +490,21 @@ app.post('/contact', function(req, res) {
     if (req.user) {
         findByName(req.body.to_user, function(err, to_user) {
             if (!err) {
+                if (req.body._id) {
+
+                }
                 var message = {
                     from: req.user.email,
                     to: to_user.email,
                     subject: 'TeaHarmony Message from ' + req.user.name,
-                    text: 'You\'ve recieved a message from ' +
-                          req.user.name + ' on TeaHarmony.\n' +
-                          '\n----------------\n\n' +
-                          req.body.message +
-                          '\n\n----------------\n\n' +
-                          'Respond to them at ' + req.user.email +
-                          ', or send them a message by going to ' +
-                          site.url + '/contact/' + req.user.name + '.'
+                    text:   'You\'ve recieved a message from ' +
+                            req.user.name + ' on TeaHarmony.\n' +
+                            '\n----------------\n\n' +
+                            req.body.message +
+                            '\n\n----------------\n\n' +
+                            'Respond to them at ' + req.user.email +
+                            ', or send them a message by going to ' +
+                            site.url + '/contact/' + req.user.name + '.'
                 };
                 emailTransport.sendMail(message, function(mail_err, mail_res) {
                     if (mail_err) {
@@ -603,15 +627,7 @@ app.get('/list', function(req, res) {
             console.log(err);
             req.flash('message', { type: 'danger', content: 'Database failure: ' + err });
         }
-        var next_page = _.last(req.flash('next_page'));
-        if (next_page) {
-            _.each(ctx.messages, function(message) {
-                req.flash('message', message);
-            });
-            res.redirect(next_page);
-        } else {
-            res.render('list', ctx);
-        }
+        res.render('list', ctx);
     });
 });
 app.get('/list/:what', list_filter);
