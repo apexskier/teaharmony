@@ -8,6 +8,23 @@ mixin person(name, id)
     else
         span.label.label-info: a(href="#{url}")= name
 
+mixin trade_form(type)
+    .form-group
+        label(for="#{type}") I'm
+            case type
+                when 'want'
+                    |  seeking:
+                when 'have'
+                    |  offering:
+        select.form-control.input-lg(name="#{type}", required)
+            option(value="null") Choose One
+            if path == '/'
+                option(value="null") nothing but love
+            - for (trade in trades)
+                unless trade == 'any'
+                    option(value="#{trade}")= trades[trade]
+
+
 mixin items(none_message)
     if items && items.length > 0
         - for (i in items)

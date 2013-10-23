@@ -10,7 +10,7 @@ block content
     .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
         form(role="form", method="post", action="/contact")
             if about
-                input(type="hidden", name="_id", value="about._id")
+                input(type="hidden", name="_id", value="#{about.id}")
 
                 p About #{trades[about.value.what]} they #{terms.second[about.value.type]}.
 
