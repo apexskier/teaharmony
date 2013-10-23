@@ -36,9 +36,14 @@ mixin items(none_message)
                 | .&nbsp;
                 if user
                     small
-                        - var url = '/contact/' + name + ((id) ? '/' + id : '')
+                        - var url = '/contact/' + item.user + ((item._id) ? '/' + item._id : '')
                         unless user.name == name
                             a.btn.btn-info.btn-xs(href="#{url}") contact
+                            | &nbsp;
+                            if (!item.messages || item.messages == 0)
+                                span.badge.none= item.messages || 0
+                            else
+                                span.badge= item.messages || 0
                             | &nbsp;
                         if user && user.roles[0] == "admin"
                             a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete

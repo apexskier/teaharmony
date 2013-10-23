@@ -490,33 +490,64 @@ app.post('/contact', function(req, res) {
     if (req.user) {
         findByName(req.body.to_user, function(err, to_user) {
             if (!err) {
+                var message_text =  'You\'ve recieved a message from ' +
+                                    req.user.name + ' on TeaHarmony';
                 if (req.body._id) {
+                    // lookup in database.
+                    db.view('teaharmony', 'by_id', { keys: [req.body._id] }, function(err, body) {
+                        if (!err && body.rows.length > 0) {
+                            message_text += ' about ' + site.trades[body.rows[0].value.what] +
+                                            ' you ' + site.terms.second[body.rows[0].value.type];
+                            console.log(req.body._id);
+                            console.log(body.rows[0]);
+                            var doc = {
+                                "_id": req.body._id,
+                                "_rev": body.rows[0].value._rev,
+                                "messages": (body.rows[0].value.messages || 0) + 1,
+                                "date": new Date(),
 
+                                "user": body.rows[0].value.user
+                            }
+                            doc[body.rows[0].value.type] = body.rows[0].value.what;
+                            console.log(doc);
+                            db.bulk({"docs": [ doc ]}, function(err, body) {
+                                console.log(body);
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            afterCheck();
+                        }
+                    });
+                } else {
+                    afterCheck();
                 }
-                var message = {
-                    from: req.user.email,
-                    to: to_user.email,
-                    subject: 'TeaHarmony Message from ' + req.user.name,
-                    text:   'You\'ve recieved a message from ' +
-                            req.user.name + ' on TeaHarmony.\n' +
-                            '\n----------------\n\n' +
-                            req.body.message +
-                            '\n\n----------------\n\n' +
-                            'Respond to them at ' + req.user.email +
-                            ', or send them a message by going to ' +
-                            site.url + '/contact/' + req.user.name + '.'
-                };
-                emailTransport.sendMail(message, function(mail_err, mail_res) {
-                    if (mail_err) {
-                        console.log(mail_err);
-                        req.flash('message', {type: 'danger', content: 'Email failed to send: ' + mail_err });
-                        res.redirect('/contact/' + req.body.to_user);
-                    } else {
-                        console.log("Sent an email to " + to_user.email)
-                        req.flash('message', { type: 'success', content: 'Successfully emailed ' + to_user.name + '.' });
-                        res.redirect(site.home_dir);
-                    }
-                });
+                function afterCheck() {
+                    message_text += '.\n\n----------------\n\n' +
+                                    req.body.message +
+                                    '\n\n----------------\n\n' +
+                                    'Respond to them at ' + req.user.email +
+                                    ', or send them a message by going to ' +
+                                    site.url + '/contact/' + req.user.name + '.'
+                    var message = {
+                        from: req.user.email,
+                        to: to_user.email,
+                        subject: 'TeaHarmony Message from ' + req.user.name,
+                        text: message_text
+                    };
+                    console.log(message.text);
+                    emailTransport.sendMail(message, function(mail_err, mail_res) {
+                        if (mail_err) {
+                            console.log(mail_err);
+                            req.flash('message', {type: 'danger', content: 'Email failed to send: ' + mail_err });
+                            res.redirect('/contact/' + req.body.to_user);
+                        } else {
+                            console.log("Sent an email to " + to_user.email)
+                            req.flash('message', { type: 'success', content: 'Successfully emailed ' + to_user.name + '.' });
+                            res.redirect(site.home_dir);
+                        }
+                    });
+                }
             } else {
                 console.log(err);
                 req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
@@ -592,7 +623,7 @@ app.get('/matches', function(req, res) {
                             return item.user == req.user.name;
                         });
                         items = _.sortBy(items, function(item) {
-                            return item.date;
+                            return item.messages;
                         }).reverse();
                         ctx.items = items;
                         res.render('matches', ctx);

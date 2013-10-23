@@ -25,3 +25,7 @@ a.label:hover {
 h2 ~ .jumbotron {
     margin-top: 15px;
 }
+
+.badge.none {
+    background-color: #5cb85c;
+}
