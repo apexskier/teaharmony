@@ -20,7 +20,7 @@ block content
 
             .form-group
                 label.sr-only(for="email") Email
-                input#email.form-control.input-lg(type="email", name="email", value="#{user.email}")
+                input#email.form-control.input-lg(type="email", name="email", value="#{user.email}", required="true")
 
             .form-group
                 label.sr-only(for="password") Password
@@ -39,6 +39,11 @@ block content
                 |  you #{terms.second[item.type]}&nbsp;
                 +trade(item.what)
                 | .&nbsp;
+                if (!item.messages || item.messages == 0)
+                    span.badge.none= item.messages || 0
+                else
+                    span.badge= item.messages || 0
+                | &nbsp;
                 small: a.btn.btn-warning.btn-xs(href="email_reset/#{item._id}") reset email count
                 | &nbsp;
                 small: a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete

@@ -8,7 +8,7 @@ block content
             .page-1
                 .form-group.parallax
                     label.sr-only(for="username", class="sr-only") Name
-                    input#name.form-control.input-lg(type="text", name="username", placeholder="Hi, what's your username?", required)
+                    input#name.form-control.input-lg(type="text", name="username", placeholder="Hi, what's your username?", required="true", autofocus="true")
                 .row.parallax
                     .col-sm-6
                         +trade_form('have')
@@ -21,11 +21,11 @@ block content
             .page-2
                 .form-group
                     label.sr-only(for="email") Email
-                    input#email.form-control.input-lg(type="email", name="email", placeholder="Your email?", required)
+                    input#email.form-control.input-lg(type="email", name="email", placeholder="Your email?", required="required")
 
                 .form-group
                     label.sr-only(for="password") Password
-                    input#password.form-control.input-lg(type="password", name="password", placeholder="Create your password")
+                    input#password.form-control.input-lg(type="password", name="password", placeholder="Create your password", required="register")
 
                 .hidden
                     input#hnypt(type="text", name="hnypt")

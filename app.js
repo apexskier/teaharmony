@@ -211,98 +211,103 @@ app.post('/register', function(req, res) {
                 req.flash('message', 'Invalid username. Username may contain only letters, numbers, spaces, underscores, and dashes and must be between 4 and 16 characters long.');
                 res.redirect('back');
             } else {
-                usersdb.view('general', 'names', { keys: [user.name] }, function(err, body) {
-                    if (!err) {
-                        if (body.rows.length > 0) {
-                            passport.authenticate('local', function(err, user, info) {
-                                if (err) {
-                                    req.flash('message', 'Something went wrong: ' + err);
-                                    return res.redirect('/');
-                                } else if (!user) {
-                                    req.flash('message', 'The username ' + req.body.name + ' has been taken already.');
-                                    res.redirect('/');
-                                } else {
-                                    req.login(user, function(err) {
-                                        if (err) {
-                                            console.log(err);
-                                            req.flash('message', 'Something went wrong: ' + err);
-                                            return res.redirect('/');
-                                        }
-                                        req.flash('message', { type: 'success', content: 'You already have an account and have been logged in.' });
-                                        res.redirect(site.home_dir);
-                                    });
-                                }
-                            })(req, res);
-                        } else {
-                            usersdb.insert(user, 'org.couchdb.user:' + user.name, function(err, body) {
-                                var fail = function(err, to) {
-                                    console.log(err);
-                                    req.flash('message', { type: 'danger', content: err });
-                                    res.redirect(to);
-                                };
-                                if (!err) {
-                                    var message = {
-                                        to: user.email,
-                                        subject: 'TeaHarmony registration',
-                                        text: 'You\'ve created account at TeaHarmony!\n' +
-                                              'Your username is "' + user.name + '".' + '\n\n' +
-                                              'Sign in to view your matches today at ' + site.url + '/login.\n\n' +
-                                              'Thanks for joining!'
-                                    };
-                                    emailTransport.sendMail(message);
-                                    if (body.error) {
-                                        fail(body.error, body.error + body.description);
+                if (user.password.length < 6) {
+                    req.flash('message', 'Please use at least 6 characters for your password.');
+                    res.redirect('back');
+                } else {
+                    usersdb.view('general', 'names', { keys: [user.name] }, function(err, body) {
+                        if (!err) {
+                            if (body.rows.length > 0) {
+                                passport.authenticate('local', function(err, user, info) {
+                                    if (err) {
+                                        req.flash('message', 'Something went wrong: ' + err);
+                                        return res.redirect('/');
+                                    } else if (!user) {
+                                        req.flash('message', 'The username ' + req.body.name + ' has been taken already.');
+                                        res.redirect('/');
                                     } else {
-                                        if (user.have && user.have != 'null') {
-                                            db.insert({
-                                                user: user.name,
-                                                have: user.have,
-                                                date: new Date()
-                                            }, function(err, body) {
-                                                console.log(err);
-                                                if (err) {
-                                                    fail(err, '/list')
-                                                } else {
-                                                    return;
-                                                }
-                                            });
-                                        }
-                                        if (user.want && user.want != 'null') {
-                                            db.insert({
-                                                user: user.name,
-                                                want: user.want,
-                                                date: new Date()
-                                            }, function(err, body) {
-                                                if (err) {
-                                                    fail(err, '/list')
-                                                } else {
-                                                    return;
-                                                }
-                                            });
-                                        }
                                         req.login(user, function(err) {
                                             if (err) {
-                                                fail(err, '/list');
+                                                console.log(err);
+                                                req.flash('message', 'Something went wrong: ' + err);
+                                                return res.redirect('/');
                                             }
-                                        });
-                                        passport.authenticate('local')(req, res, function(err) {
-                                            req.flash('message', { type: 'success', content: 'Welcome to TeaHarmony!' });
+                                            req.flash('message', { type: 'success', content: 'You already have an account and have been logged in.' });
                                             res.redirect(site.home_dir);
                                         });
                                     }
-                                } else {
-                                    if (err.status_code == 409) {
+                                })(req, res);
+                            } else {
+                                usersdb.insert(user, 'org.couchdb.user:' + user.name, function(err, body) {
+                                    var fail = function(err, to) {
+                                        console.log(err);
+                                        req.flash('message', { type: 'danger', content: err });
+                                        res.redirect(to);
+                                    };
+                                    if (!err) {
+                                        var message = {
+                                            to: user.email,
+                                            subject: 'TeaHarmony registration',
+                                            text: 'You\'ve created account at TeaHarmony!\n' +
+                                                  'Your username is "' + user.name + '".' + '\n\n' +
+                                                  'Sign in to view your matches today at ' + site.url + '/login.\n\n' +
+                                                  'Thanks for joining!'
+                                        };
+                                        emailTransport.sendMail(message);
+                                        if (body.error) {
+                                            fail(body.error, body.error + body.description);
+                                        } else {
+                                            if (user.have && user.have != 'null') {
+                                                db.insert({
+                                                    user: user.name,
+                                                    have: user.have,
+                                                    date: new Date()
+                                                }, function(err, body) {
+                                                    console.log(err);
+                                                    if (err) {
+                                                        fail(err, '/list')
+                                                    } else {
+                                                        return;
+                                                    }
+                                                });
+                                            }
+                                            if (user.want && user.want != 'null') {
+                                                db.insert({
+                                                    user: user.name,
+                                                    want: user.want,
+                                                    date: new Date()
+                                                }, function(err, body) {
+                                                    if (err) {
+                                                        fail(err, '/list')
+                                                    } else {
+                                                        return;
+                                                    }
+                                                });
+                                            }
+                                            req.login(user, function(err) {
+                                                if (err) {
+                                                    fail(err, '/list');
+                                                }
+                                            });
+                                            passport.authenticate('local')(req, res, function(err) {
+                                                req.flash('message', { type: 'success', content: 'Welcome to TeaHarmony!' });
+                                                res.redirect(site.home_dir);
+                                            });
+                                        }
                                     } else {
-                                        fail(err.status_code + ": " + err.description, '/register');
+                                        if (err.status_code == 409) {
+                                        } else {
+                                            fail(err.status_code + ": " + err.description, '/register');
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
+                        } else {
+                            req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
+                            res.redirect('back');
                         }
-                    } else {
-                        req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                        res.redirect('back');
-                    }
-                });
+                    });
+                }
             }
         }
     } else {
@@ -408,7 +413,47 @@ app.get('/delete/:_id', function(req, res) {
         res.redirect('/login');
     }
     res.redirect('back');
-})
+});
+app.get('/email_reset/:_id', function(req, res) {
+    console.log(req.params._id);
+    if (req.user) {
+        db.view('teaharmony', 'delete_user_check', { keys: [req.params._id] }, function(err, body) {
+            console.log(body);
+            var item = body.rows[0].value;
+            console.log(item);
+            if (!err && item) {
+                if (item.user == req.user.name || _.contains(req.user.roles, 'admin')) {
+                    item.messages = 0;
+                    db.bulk({"docs": [item]}, function(err, body) {
+                        console.log(err);
+                        console.log(body);
+                        if (!err) {
+                            if (!body.error) {
+                                req.flash('message', { type: 'success', content: 'Successfully deleted that.' });
+                            } else {
+                                req.flash('message', 'Couldn\'t delete that: ' + body.error);
+                            }
+                        } else {
+                            console.log(err);
+                            req.flash('message', { type: 'danger', content: 'Something went wrong deleting that.' });
+                        }
+                    });
+                } else {
+                    console.log(req.user.name + ' tried to update ' + req.params._id);
+                    req.flash('message', { type: 'danger', content: 'You don\'t own that, and can\'t update it.' });
+                }
+            } else {
+                console.log(err);
+                req.flash('message', { type: 'danger', content: 'Something went wrong updating that.' });
+            }
+        });
+    } else {
+        req.flash('message', 'Login to do that.');
+        req.flash('next_page', '/user');
+        res.redirect('/login');
+    }
+    res.redirect('back');
+});
 app.get('/have', function(req, res) {
     if (req.user) {
         res.render('have', site.ctx(req));

@@ -16,8 +16,8 @@ mixin trade_form(type)
                     |  seeking:
                 when 'have'
                     |  offering:
-        select.form-control.input-lg(name="#{type}", required)
-            option(value="null") Choose One
+        select.form-control.input-lg(name="#{type}")
+            option(value="null" selected="selected") Choose One
             if path == '/'
                 option(value="null") nothing but love
             - for (trade in trades)
@@ -45,6 +45,8 @@ mixin items(none_message)
                                 span.badge= item.messages || 0
                             | &nbsp;
                         if user && user.roles[0] == "admin"
+                            small: a.btn.btn-warning.btn-xs(href="email_reset/#{item._id}") reset email count
+                            | &nbsp;
                             a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete
     else
         p.lead!= none_message
