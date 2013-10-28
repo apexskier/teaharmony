@@ -1,12 +1,12 @@
 mixin trade(code)
-    span.label.label-primary: a(href="/#{code}")= trades[code]
+    span.label.label-primary: a(href="#{dir}/#{code}")= trades[code]
 
 mixin person(name, id)
     - var url = '/contact/' + name + ((id) ? '/' + id : '')
     if user && user.name == name
-        span.label.label-default: a(href="#{url}")= name
+        span.label.label-default: a(href="#{dir}/#{url}")= name
     else
-        span.label.label-info: a(href="#{url}")= name
+        span.label.label-info: a(href="#{dir}/#{url}")= name
 
 mixin trade_form(type)
     .form-group
@@ -61,28 +61,28 @@ html
     body
         .container
             .navbar
-                a(href="/list")
+                a(href="#{dir}/list")
                     h1.navbar-brand TeaHarmony
                 .navbar-right.pull-right
                     p.navbar-text.hidden-xs
                         if user
                             | Welcome,&nbsp;
-                            span.text-info: a(href="/user")= user.name
+                            span.text-info: a(href="#{dir}/user")= user.name
                         else if path == '/'
                             | Already a member?
 
                     .btn-group
                         unless path == '/list'
-                            a.btn.btn-info.navbar-btn(href="/list") All
+                            a.btn.btn-info.navbar-btn(href="#{dir}/list") All
 
                         if user
                             unless path == '/matches'
-                                a.btn.btn-primary.navbar-btn(href="/matches") Your matches
-                            a#logout.btn.btn-default.navbar-btn(href="/logout") Log Out
+                                a.btn.btn-primary.navbar-btn(href="#{dir}/matches") Your matches
+                            a#logout.btn.btn-default.navbar-btn(href="#{dir}/logout") Log Out
                         else
                             unless path == '/'
-                                a.btn.btn-default.navbar-btn(href="/") Register
-                            a#login.btn.btn-default.navbar-btn(href="/login") Log In
+                                a.btn.btn-default.navbar-btn(href="#{dir}/") Register
+                            a#login.btn.btn-default.navbar-btn(href="#{dir}/login") Log In
 
             if messages
                 - for (i in messages)

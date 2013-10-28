@@ -58,6 +58,7 @@ var site = {
     ctx: function(req) {
         var ctx = _.clone(site.default_ctx);
         ctx.path = req.path;
+        ctx.dir = site.dir;
         ctx.user = req.user || null;
         ctx.terms = site.terms;
         ctx.trades = site.trades;
@@ -79,7 +80,8 @@ var site = {
     },
     validTrade: function(trade) {
         return _.contains(_.without(_.keys(site.trades), 'any'), trade);
-    }
+    },
+    dir: ""
 }
 
 /*
@@ -164,17 +166,20 @@ if ('development' == app.get('env')) {
 /*
  * Pages
  */
-app.get('/', function(req, res) {
+/*app.get('/', function(req, res) {
+    res.render('site');
+});*/
+app.get(site.dir + '/', function(req, res) {
     if (req.user) {
         res.redirect(site.home_dir);
     } else {
         res.render('index', site.ctx(req));
     }
 });
-app.get('/login', function(req, res) {
+app.get(site.dir + '/login', function(req, res) {
     if (req.user) {
         req.flash('message', 'Already logged in');
-        res.redirect('/next');
+        res.redirect(site.dir + '/next');
     } else {
         var errors = req.flash('error');
         _.each(errors, function(error) {
@@ -183,12 +188,12 @@ app.get('/login', function(req, res) {
         res.render('login', site.ctx(req));
     }
 });
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/next',
-    failureRedirect: '/login',
+app.post(site.dir + '/login', passport.authenticate('local', {
+    successRedirect: site.dir + '/next',
+    failureRedirect: site.dir + '/login',
     failureFlash: true
 }));
-app.get('/next', function(req, res) {
+app.get(site.dir + '/next', function(req, res) {
     var next_page = _.last(req.flash('next_page'));
     if (next_page) {
         res.redirect(next_page);
@@ -196,7 +201,7 @@ app.get('/next', function(req, res) {
         res.redirect(site.home_dir);
     }
 });
-app.post('/register', function(req, res) {
+app.post(site.dir + '/register', function(req, res) {
     var user = req.body;
     user.name = user.username;
     user._id = "org.couchdb.user:" + user.name;
@@ -205,15 +210,15 @@ app.post('/register', function(req, res) {
     if (!user.hnypt) {
         if (!site.validEmail(user.email)) {
             req.flash('message', 'Invalid email given.');
-            res.redirect('back');
+            res.redirect(site.dir + 'back');
         } else {
             if (!site.validUsername(user.name)) {
                 req.flash('message', 'Invalid username. Username may contain only letters, numbers, spaces, underscores, and dashes and must be between 4 and 16 characters long.');
-                res.redirect('back');
+                res.redirect(site.dir + 'back');
             } else {
                 if (user.password.length < 6) {
                     req.flash('message', 'Please use at least 6 characters for your password.');
-                    res.redirect('back');
+                    res.redirect(site.dir + 'back');
                 } else {
                     usersdb.view('general', 'names', { keys: [user.name] }, function(err, body) {
                         if (!err) {
@@ -221,16 +226,16 @@ app.post('/register', function(req, res) {
                                 passport.authenticate('local', function(err, user, info) {
                                     if (err) {
                                         req.flash('message', 'Something went wrong: ' + err);
-                                        return res.redirect('/');
+                                        return res.redirect(site.dir + '/');
                                     } else if (!user) {
                                         req.flash('message', 'The username ' + req.body.name + ' has been taken already.');
-                                        res.redirect('/');
+                                        res.redirect(site.dir + '/');
                                     } else {
                                         req.login(user, function(err) {
                                             if (err) {
                                                 console.log(err);
                                                 req.flash('message', 'Something went wrong: ' + err);
-                                                return res.redirect('/');
+                                                return res.redirect(site.dir + '/');
                                             }
                                             req.flash('message', { type: 'success', content: 'You already have an account and have been logged in.' });
                                             res.redirect(site.home_dir);
@@ -304,7 +309,7 @@ app.post('/register', function(req, res) {
                             }
                         } else {
                             req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                            res.redirect('back');
+                            res.redirect(site.dir + 'back');
                         }
                     });
                 }
@@ -315,16 +320,16 @@ app.post('/register', function(req, res) {
         res.send('nope')
     }
 });
-app.get('/register', function(req, res) {
+app.get(site.dir + '/register', function(req, res) {
     req.flash('message', 'Something went wrong, /register isn\'t really a page.');
-    res.redirect('/');
+    res.redirect(site.dir + '/');
 });
-app.get('/logout', function(req, res) {
+app.get(site.dir + '/logout', function(req, res) {
     req.logout();
     req.flash('message', { type: 'success', content: 'Logged out' });
-    res.redirect('/');
+    res.redirect(site.dir + '/');
 });
-app.get('/user', function(req, res) {
+app.get(site.dir + '/user', function(req, res) {
     if (req.user) {
         db.view('teaharmony', 'user_all', { keys: [req.user.name] }, function(err, body) {
             var ctx = site.ctx(req);
@@ -347,10 +352,10 @@ app.get('/user', function(req, res) {
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.post('/user', function(req, res) {
+app.post(site.dir + '/user', function(req, res) {
     if (req.user) {
         if (!site.validEmail(req.body.email)) {
             req.flash('message', 'Invalid email given.');
@@ -370,16 +375,16 @@ app.post('/user', function(req, res) {
                     console.log(err);
                     req.flash('message', { type: 'danger', content: 'Something went wrong updating your account.' });
                 }
-                res.redirect('/user');
+                res.redirect(site.dir + '/user');
             });
         }
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.get('/delete/:_id', function(req, res) {
+app.get(site.dir + '/delete/:_id', function(req, res) {
     if (req.user) {
         db.view('teaharmony', 'delete_user_check', { keys: [req.params._id] }, function(err, body) {
             var item = body.rows[0].value;
@@ -410,11 +415,11 @@ app.get('/delete/:_id', function(req, res) {
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', '/user');
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
     res.redirect('back');
 });
-app.get('/email_reset/:_id', function(req, res) {
+app.get(site.dir + '/email_reset/:_id', function(req, res) {
     console.log(req.params._id);
     if (req.user) {
         db.view('teaharmony', 'delete_user_check', { keys: [req.params._id] }, function(err, body) {
@@ -450,20 +455,20 @@ app.get('/email_reset/:_id', function(req, res) {
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', '/user');
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
     res.redirect('back');
 });
-app.get('/have', function(req, res) {
+app.get(site.dir + '/have', function(req, res) {
     if (req.user) {
         res.render('have', site.ctx(req));
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.post('/have', function(req, res) {
+app.post(site.dir + '/have', function(req, res) {
     if (req.user) {
         if (site.validTrade(req.body.have)) {
             db.insert({
@@ -474,7 +479,7 @@ app.post('/have', function(req, res) {
                 if (err) {
                     console.log(err);
                     req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                    res.redirect('/have');
+                    res.redirect(site.dir + '/have');
                 } else {
                     req.flash('message', { type: 'success', content: 'Successfully posted request.' });
                     res.redirect(site.home_dir);
@@ -487,19 +492,19 @@ app.post('/have', function(req, res) {
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.get('/want', function(req, res) {
+app.get(site.dir + '/want', function(req, res) {
     if (req.user) {
         res.render('want', site.ctx(req));
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.post('/want', function(req, res) {
+app.post(site.dir + '/want', function(req, res) {
     if (req.user) {
         if (site.validTrade(req.body.want)) {
             db.view('teaharmony', 'user_want', { keys: [req.user.name] }, function(err, body) {
@@ -513,7 +518,7 @@ app.post('/want', function(req, res) {
                             if (err) {
                                 console.log(err);
                                 req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                                res.redirect('/want');
+                                res.redirect(site.dir + '/want');
                             } else {
                                 req.flash('message', { type: 'success', content: 'Successfully posted!' });
                                 res.redirect(site.home_dir);
@@ -527,7 +532,7 @@ app.post('/want', function(req, res) {
                 } else {
                     console.log(err);
                     req.flash('message', { type: 'danger', content: 'Database error: ' + err });
-                    res.redirect('/want');
+                    res.redirect(site.dir + '/want');
                 }
             })
         } else {
@@ -537,14 +542,14 @@ app.post('/want', function(req, res) {
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', req.path);
-        res.redirect('/');
+        res.redirect(site.dir + '/');
     }
 });
-app.get('/contact', function(req, res) {
+app.get(site.dir + '/contact', function(req, res) {
     req.flash('message', 'That page doesn\'t exist.');
-    res.redirect('/');
+    res.redirect(site.dir + '/');
 });
-app.post('/contact', function(req, res) {
+app.post(site.dir + '/contact', function(req, res) {
     if (req.user) {
         findByName(req.body.to_user, function(err, to_user) {
             if (!err) {
@@ -598,7 +603,7 @@ app.post('/contact', function(req, res) {
                         if (mail_err) {
                             console.log(mail_err);
                             req.flash('message', {type: 'danger', content: 'Email failed to send: ' + mail_err });
-                            res.redirect('/contact/' + req.body.to_user);
+                            res.redirect(site.dir + '/contact/' + req.body.to_user);
                         } else {
                             console.log("Sent an email to " + to_user.email)
                             req.flash('message', { type: 'success', content: 'Successfully emailed ' + to_user.name + '.' });
@@ -609,16 +614,16 @@ app.post('/contact', function(req, res) {
             } else {
                 console.log(err);
                 req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                res.redirect('/contact/' + req.body.to_user);
+                res.redirect(site.dir + '/contact/' + req.body.to_user);
             }
         });
     } else {
         req.flash('message', 'Please login to do that.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.get('/contact/:user', function(req, res) {
+app.get(site.dir + '/contact/:user', function(req, res) {
     if (req.user) {
         findByName(req.params.user, function(err, to_user) {
             if (to_user) {
@@ -628,16 +633,16 @@ app.get('/contact/:user', function(req, res) {
             } else {
                 console.log(err);
                 req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                res.redirect('/');
+                res.redirect(site.dir + '/');
             }
         });
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.get('/contact/:user/:id', function(req, res) {
+app.get(site.dir + '/contact/:user/:id', function(req, res) {
     if (req.user) {
         findByName(req.params.user, function(err, to_user) {
             if (to_user) {
@@ -663,10 +668,10 @@ app.get('/contact/:user/:id', function(req, res) {
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        return res.redirect('/login');
+        return res.redirect(site.dir + '/login');
     }
 });
-app.get('/matches', function(req, res) {
+app.get(site.dir + '/matches', function(req, res) {
     if (req.user) {
         db.view('teaharmony', 'user_all', { keys: [req.user.name] }, function(err, body) {
             var ctx = site.ctx(req);
@@ -698,10 +703,10 @@ app.get('/matches', function(req, res) {
     } else {
         req.flash('message', 'Please login to view this page.');
         req.flash('next_page', req.path);
-        res.redirect('/login');
+        res.redirect(site.dir + '/login');
     }
 });
-app.get('/list', function(req, res) {
+app.get(site.dir + '/list', function(req, res) {
     db.view('teaharmony', 'all', function(err, body) {
         var ctx = site.ctx(req);
         if (!err) {
@@ -719,15 +724,15 @@ app.get('/list', function(req, res) {
         res.render('list', ctx);
     });
 });
-app.get('/list/:what', list_filter);
-app.get('/list/:what/:trade', list_filter);
+app.get(site.dir + '/list/:what', list_filter);
+app.get(site.dir + '/list/:what/:trade', list_filter);
 function list_filter(req, res) {
     if ((req.params.what == 'any' && req.params.trade == 'any') ||
          (req.params.what == 'any' && !req.params.trade)) {
-        res.redirect('/list');
+        res.redirect(site.dir + '/list');
     } else {
         if (req.params.trade == 'any') {
-            res.redirect('/list/' + req.params.what);
+            res.redirect(site.dir + '/list/' + req.params.what);
         } else {
             var ctx = site.ctx(req);
             var keys = (req.params.what == 'any') ? ['have', 'want'] : [req.params.what];
@@ -754,16 +759,16 @@ function list_filter(req, res) {
         }
     }
 };
-app.get('/kefir', function(req, res) {
+app.get(site.dir + '/kefir', function(req, res) {
     res.render('kefir', site.ctx(req));
 });
-app.get('/scoby', function(req, res) {
+app.get(site.dir + '/scoby', function(req, res) {
     res.render('scoby', site.ctx(req));
 });
-app.get('/parallax', function(req, res) {
+app.get(site.dir + '/parallax', function(req, res) {
     res.render('parallax', site.ctx(req));
 });
-app.get('/500', function(req, res) { // testing
+app.get(site.dir + '/500', function(req, res) { // testing
     throw new Error('garbage');
 });
 app.use(function(req, res, next) {
