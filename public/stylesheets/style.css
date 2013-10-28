@@ -29,3 +29,7 @@ h2 ~ .jumbotron {
 .badge.none {
     background-color: #5cb85c;
 }
+
+.text-center img {
+    margin: 0 auto;
+}

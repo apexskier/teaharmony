@@ -19,7 +19,8 @@ var usersdb = nano.db.use('_users');
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('env', process.env.ENV || 'development');
+app.set('port', (process.env.PORT || (process.env.ENV == 'live' ? 80 : 3000))); // set port to specified port number, 80 if env is live, or 3000 otherwise
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -65,7 +66,6 @@ var site = {
         return ctx;
     },
     default_ctx: {
-        title: "TeaHarmony",
     },
     url: "http://glacier.camlittle.com:3000",
     home_dir: '/matches',
@@ -76,6 +76,9 @@ var site = {
     username_re: /^([a-zA-Z0-9]((_|-| )[a-zA-Z0-9])?)*$/,
     validUsername: function(name) {
         return (site.username_re.test(name) && (name.length <= 16) && (name.length >= 4));
+    },
+    validTrade: function(trade) {
+        return _.contains(_.without(_.keys(site.trades), 'any'), trade);
     }
 }
 
@@ -349,7 +352,7 @@ app.post('/user', function(req, res) {
             res.redirect('back');
         } else {
             var new_user = _.clone(req.user);
-            if (req.body.email && req.body.email != user.email) {
+            if (req.body.email && req.body.email != req.user.email) {
                 new_user.email = req.body.email;
             }
             if (req.body.password) {
@@ -417,24 +420,29 @@ app.get('/have', function(req, res) {
 });
 app.post('/have', function(req, res) {
     if (req.user) {
-        db.insert({
-            user: req.user.name,
-            have: req.body.have,
-            date: new Date()
-        }, function(err, body) {
-            if (err) {
-                console.log(err);
-                req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                res.redirect('/have');
-            } else {
-                req.flash('message', { type: 'success', content: 'Successfully posted request.' });
-                res.redirect(site.home_dir);
-            }
-        });
+        if (site.validTrade(req.body.have)) {
+            db.insert({
+                user: req.user.name,
+                have: req.body.have,
+                date: new Date()
+            }, function(err, body) {
+                if (err) {
+                    console.log(err);
+                    req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
+                    res.redirect('/have');
+                } else {
+                    req.flash('message', { type: 'success', content: 'Successfully posted request.' });
+                    res.redirect(site.home_dir);
+                }
+            });
+        } else {
+            req.flash('message', 'Please select something you are offering.');
+            res.redirect('back');
+        }
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', req.path);
-        res.redirect('/');
+        res.redirect('/login');
     }
 });
 app.get('/want', function(req, res) {
@@ -448,34 +456,39 @@ app.get('/want', function(req, res) {
 });
 app.post('/want', function(req, res) {
     if (req.user) {
-        db.view('teaharmony', 'user_want', { keys: [req.user.name] }, function(err, body) {
-            if (!err) {
-                if (_.where(_.pluck(body.rows, 'value'), { what: req.body.want }) == 0) {
-                    db.insert({
-                        user: req.user.name,
-                        want: req.body.want,
-                        date: new Date()
-                    }, function(err, body) {
-                        if (err) {
-                            console.log(err);
-                            req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
-                            res.redirect('/want');
-                        } else {
-                            req.flash('message', { type: 'success', content: 'Successfully posted!' });
-                            res.redirect(site.home_dir);
-                        }
-                    });
+        if (site.validTrade(req.body.want)) {
+            db.view('teaharmony', 'user_want', { keys: [req.user.name] }, function(err, body) {
+                if (!err) {
+                    if (_.where(_.pluck(body.rows, 'value'), { what: req.body.want }) == 0) {
+                        db.insert({
+                            user: req.user.name,
+                            want: req.body.want,
+                            date: new Date()
+                        }, function(err, body) {
+                            if (err) {
+                                console.log(err);
+                                req.flash('message', { type: 'danger', content: 'Something went wrong: ' + err });
+                                res.redirect('/want');
+                            } else {
+                                req.flash('message', { type: 'success', content: 'Successfully posted!' });
+                                res.redirect(site.home_dir);
+                            }
+                        });
+                    } else {
+                        var text = '';
+                        req.flash('message', 'You have already requested ' + site.trades[req.body.want] + '.');
+                        res.redirect(site.home_dir);
+                    }
                 } else {
-                    var text = '';
-                    req.flash('message', 'You have already requested ' + site.trades[req.body.want] + '.');
-                    res.redirect(site.home_dir);
+                    console.log(err);
+                    req.flash('message', { type: 'danger', content: 'Database error: ' + err });
+                    res.redirect('/want');
                 }
-            } else {
-                console.log(err);
-                req.flash('message', { type: 'danger', content: 'Database error: ' + err });
-                res.redirect('/want');
-            }
-        })
+            })
+        } else {
+            req.flash('message', 'Please select something you are looking for.');
+            res.redirect('back');
+        }
     } else {
         req.flash('message', 'Login to do that.');
         req.flash('next_page', req.path);
@@ -696,6 +709,30 @@ function list_filter(req, res) {
         }
     }
 };
+app.get('/kefir', function(req, res) {
+    res.render('kefir', site.ctx(req));
+});
+app.get('/scoby', function(req, res) {
+    res.render('scoby', site.ctx(req));
+});
+app.get('/parallax', function(req, res) {
+    res.render('parallax', site.ctx(req));
+});
+app.get('/500', function(req, res) { // testing
+    throw new Error('garbage');
+});
+app.use(function(req, res, next) {
+    res.status(404);
+    res.render('404', site.ctx(req));
+});
+app.use(function(err, req, res, next) {
+    console.log(err);
+    ctx = site.ctx(req);
+    ctx.status = err.status || 500;
+    res.status(ctx.status);
+    ctx.err = err;
+    res.render('500', ctx)
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

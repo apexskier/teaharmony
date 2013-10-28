@@ -1,15 +1,15 @@
 extends layout
 
 block content
-    h2.text-center Welcome to #{title}
+    h2.text-center Welcome to TeaHarmony
 
-    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
+    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2.parallax(data-parallax="10")
         form#signup(role="form", method="post", action="/register")
             .page-1
-                .form-group
+                .form-group.parallax
                     label.sr-only(for="username", class="sr-only") Name
                     input#name.form-control.input-lg(type="text", name="username", placeholder="Hi, what's your username?", required)
-                .row
+                .row.parallax
                     .col-sm-6
                         +trade_form('have')
                     .col-sm-6

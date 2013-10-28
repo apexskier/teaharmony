@@ -37,6 +37,8 @@ block content
             - console.log(item)
             p.lead
                 |  you #{terms.second[item.type]}&nbsp;
-                span.label.label-primary: a(href="#") #{trades[item.what]}
+                +trade(item.what)
                 | .&nbsp;
+                small: a.btn.btn-warning.btn-xs(href="email_reset/#{item._id}") reset email count
+                | &nbsp;
                 small: a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete

@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+    h2.text-center 500 error
+
+    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
+        p Something's gone terribly wrong!
+        .text-center
+            img.img-responsive(alt="some fancy illustration of a broken mug maybe", src="https://farm2.staticflickr.com/1284/1164370623_15c22be54e.jpg")
+        if err
+            br
+            p Maybe this will help:
+            pre= err

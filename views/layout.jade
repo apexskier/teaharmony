@@ -24,7 +24,6 @@ mixin trade_form(type)
                 unless trade == 'any'
                     option(value="#{trade}")= trades[trade]
 
-
 mixin items(none_message)
     if items && items.length > 0
         - for (i in items)
@@ -53,28 +52,32 @@ mixin items(none_message)
 doctype 5
 html
     head
-        title= title + ' #1 Trusted Brewing Online Exchange Site'
-        meta(name="viewport" content="width=device-width, user-scalable=false;")
+        title TeaHarmony #1 Trusted Brewing Online Exchange Site
+        meta(name="viewport" content="width=device-width, user-scalable=no")
         link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
     body
         .container
             .navbar
                 a(href="/list")
-                    h1.navbar-brand= title
+                    h1.navbar-brand TeaHarmony
                 .navbar-right.pull-right
-                    if user
-                        p.navbar-text.hidden-xs Welcome,&nbsp;
+                    p.navbar-text.hidden-xs
+                        if user
+                            | Welcome,&nbsp;
                             span.text-info: a(href="/user")= user.name
-                        .btn-group
+                        else if path == '/'
+                            | Already a member?
+
+                    .btn-group
+                        unless path == '/list'
+                            a.btn.btn-info.navbar-btn(href="/list") All
+
+                        if user
                             unless path == '/matches'
                                 a.btn.btn-primary.navbar-btn(href="/matches") Your matches
-                            else
-                                a.btn.btn-primary.navbar-btn(href="/list") All
                             a#logout.btn.btn-default.navbar-btn(href="/logout") Log Out
-                    else
-                        p.navbar-text.hidden-xs Already a member?
-                        .btn-group
+                        else
                             unless path == '/'
                                 a.btn.btn-default.navbar-btn(href="/") Register
                             a#login.btn.btn-default.navbar-btn(href="/login") Log In
