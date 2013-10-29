@@ -39,11 +39,12 @@ block content
                 |  you #{terms.second[item.type]}&nbsp;
                 +trade(item.what)
                 | .&nbsp;
-                if (!item.messages || item.messages == 0)
-                    span.badge.none= item.messages || 0
-                else
-                    span.badge= item.messages || 0
-                | &nbsp;
-                small: a.btn.btn-warning.btn-xs(href="#{dir}/email_reset/#{item._id}") reset email count
-                | &nbsp;
-                small: a.btn.btn-danger.btn-xs(href="#{dir}/delete/#{item._id}") delete
+                small
+                    if (!item.messages || item.messages == 0)
+                        span.badge.none= item.messages || 0
+                    else
+                        span.badge= item.messages || 0
+                    | &nbsp;
+                    a.btn.btn-warning.btn-xs(href="#{dir}/email_reset/#{item._id}") reset email count
+                    | &nbsp;
+                    a.btn.btn-danger.btn-xs(href="#{dir}/delete/#{item._id}") delete

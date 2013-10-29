@@ -45,7 +45,7 @@ mixin items(none_message)
                                 span.badge= item.messages || 0
                             | &nbsp;
                         if user && user.roles[0] == "admin"
-                            small: a.btn.btn-warning.btn-xs(href="email_reset/#{item._id}") reset email count
+                            a.btn.btn-warning.btn-xs(href="email_reset/#{item._id}") reset email count
                             | &nbsp;
                             a.btn.btn-danger.btn-xs(href="delete/#{item._id}") delete
     else
