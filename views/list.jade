@@ -24,8 +24,9 @@ block content
                 button.btn.btn-default.dropdown-toggle(data-toggle="dropdown")= active_trade + ' '
                     span.caret
                 ul.dropdown-menu(role="menu")
-                    li: a(href="#{dir}/list/#{type}/scoby")= trades.scoby
-                    li: a(href="#{dir}/list/#{type}/kefir")= trades.kefir
+                    - for (trade in trades)
+                        unless trade == 'any'
+                            li: a(href="#{dir}/list/#{type}/#{trade}")= trades[trade]
                     li: a(href="#{dir}/list/#{type}")= trades.any
             | .
 

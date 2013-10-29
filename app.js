@@ -41,8 +41,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var site = {
     trades: {
-        kefir: "kefir grains",
+        milk_kefir: "milk kefir grains",
+        water_kefir: "water kefir grains",
         scoby: "a SCOBY",
+        sourdough: "sourdough starter",
+
         any: "anything"
     },
     terms: {
