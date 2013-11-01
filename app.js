@@ -12,7 +12,7 @@ var flash = require('connect-flash');
 var _ = require('underscore');
 var nodemailer = require('nodemailer')
 var LocalStrategy = require('passport-local').Strategy;
-var nano = require('nano')('http://' + privates.db_user + ':' + privates.db_pass + '@localhost:' + privates.db_port);
+var nano = require('nano')('http://' + privates.db_user + ':' + privates.db_pass + '@' + privates.db_host + ':' + privates.db_port);
 var db = nano.db.use('teaharmony');
 var usersdb = nano.db.use('_users');
 
@@ -45,7 +45,6 @@ var site = {
         water_kefir: "water kefir grains",
         scoby: "a SCOBY",
         sourdough: "sourdough starter",
-
         any: "anything"
     },
     terms: {
@@ -762,17 +761,16 @@ function list_filter(req, res) {
         }
     }
 };
-app.get(site.dir + '/kefir', function(req, res) {
-    res.render('kefir', site.ctx(req));
+app.get(site.dir + '/help', function(req, res) {
+    res.render('help', site.ctx(req));
 });
-app.get(site.dir + '/scoby', function(req, res) {
-    res.render('scoby', site.ctx(req));
-});
-app.get(site.dir + '/parallax', function(req, res) {
-    res.render('parallax', site.ctx(req));
-});
-app.get(site.dir + '/500', function(req, res) { // testing
-    throw new Error('garbage');
+app.get(site.dir + '/:topic', function(req, res) {
+    if (site.validTrade(req.params.topic)) {
+        res.render(req.params.topic, site.ctx(req));
+    } else {
+        res.status(404);
+        res.render('404', site.ctx(req));
+    }
 });
 app.use(function(req, res, next) {
     res.status(404);

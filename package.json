@@ -1,6 +1,6 @@
 {
   "name": "TeaHarmony",
-  "version": "0.0.3",
+  "version": "0.0.3-1",
   "author": "Cameron Little <cameron@camlittle.com>",
   "scripts": {
     "start": "node app.js"
@@ -18,5 +18,9 @@
     "connect-flash": "latest",
     "nano": "latest",
     "nodemailer": "latest"
+  },
+  "subdomain": "apexskier-teaharmony",
+  "engines": {
+    "node": "0.10.x"
   }
 }

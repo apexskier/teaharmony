@@ -48,3 +48,5 @@ block content
                     a.btn.btn-warning.btn-xs(href="#{dir}/email_reset/#{item._id}") reset email count
                     | &nbsp;
                     a.btn.btn-danger.btn-xs(href="#{dir}/delete/#{item._id}") delete
+        if !items || items.length == 0
+            p.lead You have no posts, let people know you <a href="/have">have something</a> or are <a href="/want">looking</a>.

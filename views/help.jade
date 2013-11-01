@@ -1,0 +1,58 @@
+extends layout
+
+block content
+
+    h2.text-center HELP!
+
+    br
+    .col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2
+        h3 What am I seeing here?
+        p Around the site you'll see the following.
+        p.lead
+            +person("username")
+            |  #{terms.any}&nbsp;
+            +trade("any")
+            | .&nbsp;
+            small
+                a.btn.btn-info.btn-xs(href="#") contact
+                | &nbsp;
+                span.badge 3
+                | &nbsp;
+
+        p This tells you&nbsp;
+            +person("who")
+            |  is offering or is looking for&nbsp;
+            span.label.label-primary: a(href="#") something.
+
+        p You can find out more about what they're offering by clicking on it.
+
+        p You can contact that person about whatever it is by clicking on their name or the&nbsp;
+            a.btn.btn-info.btn-xs(href="#") contact
+            |  button.
+
+        p The number following tells you how many times that person's been contacted about the specific item. Look for a zero!
+
+        h3 How can I change my stuff?
+
+        p Click on your username in the header to go to your account page.
+
+        p There, you can change your email and password using the form.
+
+        p If you have any active posts, you'll see them listed below just like described above, but with&nbsp;
+            a.btn.btn-danger.btn-xs(href="#") delete
+            |  and&nbsp;
+            a.btn.btn-warning.btn-xs(href="#") reset email count
+            |  buttons
+
+        p These do exactly what they say.
+
+        h3 Where'd this site come from?
+
+        p This site was started by the Western Washington Brewing Club, mostly due to Ryan Sarhan,
+            |  and was created and coded by&nbsp;
+            a(href="http://github.com/apexskier") Cameron Little
+            | .
+
+        p All the code is on&nbsp;
+            a(href="http://github.com/apexskier/teaharmony") GitHub
+            |  if you want to check it out.

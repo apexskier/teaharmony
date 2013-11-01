@@ -2,11 +2,11 @@ mixin trade(code)
     span.label.label-primary: a(href="#{dir}/#{code}")= trades[code]
 
 mixin person(name, id)
-    - var url = '/contact/' + name + ((id) ? '/' + id : '')
+    - var url = dir + '/contact/' + name + ((id) ? '/' + id : '')
     if user && user.name == name
-        span.label.label-default: a(href="#{dir}/#{url}")= name
+        span.label.label-default: a(href="#{url}")= name
     else
-        span.label.label-info: a(href="#{dir}/#{url}")= name
+        span.label.label-info: a(href="#{url}")= name
 
 mixin trade_form(type)
     .form-group
@@ -71,6 +71,7 @@ html
                         else if path == '/'
                             | Already a member?
 
+                    a.btn.btn-link(href="#{dir}/help") Help
                     .btn-group
                         unless path == '/list'
                             a.btn.btn-info.navbar-btn(href="#{dir}/list") All
