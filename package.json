@@ -3,7 +3,8 @@
   "version": "0.0.3-1",
   "author": "Cameron Little <cameron@camlittle.com>",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "live": "sudo ENV=live node /home/cameronlittle/teaharmony/app.js >> /home/cameronlittle/teaharmony.log"
   },
   "repository": {
     "type": "git",
