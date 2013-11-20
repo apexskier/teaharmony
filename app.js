@@ -711,6 +711,29 @@ app.get(site.dir + '/matches', function(req, res) {
         res.redirect(site.dir + '/login');
     }
 });
+app.get(site.dir + '/people', function(req, res) {
+    if (req.user) {
+        if (_.contains(req.user.roles, 'admin')) {
+            usersdb.view('general', 'name_email', function(err, body) {
+                if (!err) {
+                    var ctx = site.ctx(req);
+                    ctx.people = _.pluck(body.rows, 'value');
+                    res.render('people', ctx);
+                } else {
+                    console.log(err);
+                    req.flash('message', { type: 'danger', content: 'Database failure: ' + err });
+                }
+            });
+        } else {
+            req.flash('message', 'You must be an administrator to view this page.');
+            res.redirect(site.dir + '/');
+        }
+    } else {
+        req.flash('message', 'Please login to view this page.');
+        req.flash('next_page', req.path);
+        res.redirect(site.dir + '/login');
+    }
+});
 app.get(site.dir + '/list', function(req, res) {
     db.view('teaharmony', 'all', function(err, body) {
         var ctx = site.ctx(req);

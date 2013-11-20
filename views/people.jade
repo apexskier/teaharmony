@@ -1,0 +1,13 @@
+extends layout
+
+block content
+
+    h2.text-center All people
+
+    br
+
+    .col-md-8.col-md-offset-2
+        - for (i in people)
+            p.lead
+                +person(people[i].name)
+
