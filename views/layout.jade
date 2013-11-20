@@ -59,31 +59,39 @@ html
         link(rel='stylesheet', href='/stylesheets/bootstrap.min.css')
         link(rel='stylesheet', href='/stylesheets/style.css')
     body
-        .container
-            .navbar
-                a(href="#{dir}/list")
+        .navbar
+            .navbar-header
+                button(type="button", data-toggle="collapse", data-target=".navbar-collapse").navbar-toggle.btn-default
+                    span.sr-only Toggle navigation
+                    span.icon-bar
+                    span.icon-bar
+                    span.icon-bar
+                a(href="#{dir}/")
                     h1.navbar-brand TeaHarmony
-                .navbar-right.pull-right
-                    p.navbar-text.hidden-xs
-                        if user
-                            | Welcome,&nbsp;
-                            span.text-info: a(href="#{dir}/user")= user.name
-                        else if path == '/'
-                            | Already a member?
+            .collapse.navbar-collapse.navbar-right
+                p.navbar-text
+                    if user
+                        | Welcome,&nbsp;
+                        span.text-info: a(href="#{dir}/user")= user.name
+                    else if path == '/register'
+                        | Already a member?
 
-                    a.btn.btn-link(href="#{dir}/help") Help
-                    .btn-group
-                        unless path == '/list'
-                            a.btn.btn-info.navbar-btn(href="#{dir}/list") All
+                ul.nav.navbar-nav
+                    li: a(href="#{dir}/help") Help
 
-                        if user
-                            unless path == '/matches'
-                                a.btn.btn-primary.navbar-btn(href="#{dir}/matches") Your matches
-                            a#logout.btn.btn-default.navbar-btn(href="#{dir}/logout") Log Out
-                        else
-                            unless path == '/'
-                                a.btn.btn-default.navbar-btn(href="#{dir}/") Register
-                            a#login.btn.btn-default.navbar-btn(href="#{dir}/login") Log In
+                .btn-group
+                    unless path == '/list'
+                        a.btn.btn-info.navbar-btn(href="#{dir}/list") All
+
+                    if user
+                        unless path == '/matches'
+                            a.btn.btn-primary.navbar-btn(href="#{dir}/matches") Your matches
+                        a#logout.btn.btn-default.navbar-btn(href="#{dir}/logout") Log Out
+                    else
+                        unless path == '/register'
+                            a.btn.btn-default.navbar-btn(href="#{dir}/register") Register
+                        a#login.btn.btn-default.navbar-btn(href="#{dir}/login") Log In
+        .container
 
             if messages
                 - for (i in messages)

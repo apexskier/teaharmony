@@ -323,8 +323,11 @@ app.post(site.dir + '/register', function(req, res) {
     }
 });
 app.get(site.dir + '/register', function(req, res) {
-    req.flash('message', 'Something went wrong, /register isn\'t really a page.');
-    res.redirect(site.dir + '/');
+    if (req.user) {
+        res.redirect(site.home_dir);
+    } else {
+        res.render('register', site.ctx(req));
+    }
 });
 app.get(site.dir + '/logout', function(req, res) {
     req.logout();

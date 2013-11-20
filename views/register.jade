@@ -1,0 +1,35 @@
+extends layout
+
+block content
+    h2.text-center Welcome to TeaHarmony
+
+    .jumbotron.col-md-6.col-md-offset-3.col-sm-8.col-sm-offset-2.parallax(data-parallax="10")
+        form#signup(role="form", method="post", action="#{dir}/register")
+            .page-1
+                .form-group.parallax
+                    label.sr-only(for="username", class="sr-only") Name
+                    input#name.form-control.input-lg(type="text", name="username", placeholder="Hi, what's your username?", required="true", autofocus="true")
+                .row.parallax
+                    .col-sm-6
+                        +trade_form('have')
+                    .col-sm-6
+                        +trade_form('want')
+                .row
+                    .col-sm-8.col-sm-offset-2
+                        button#next.btn.btn-primary.btn-lg.btn-block(type="button") Let's go
+
+            .page-2
+                .form-group
+                    label.sr-only(for="email") Email
+                    input#email.form-control.input-lg(type="email", name="email", placeholder="Your email?", required="required")
+
+                .form-group
+                    label.sr-only(for="password") Password
+                    input#password.form-control.input-lg(type="password", name="password", placeholder="Create your password", required="register")
+
+                .hidden
+                    input#hnypt(type="text", name="hnypt")
+
+                .form-group.text-center
+                    a#back.btn.btn-link.btn-lg ‹ Go Back
+                    input#finish.btn.btn-primary.btn-lg(type="submit", Value="Find my matches")
