@@ -41,3 +41,50 @@ img.text-center,
 .navbar-toggle .icon-bar {
     background-color: #ccc;
 }
+
+.container {
+    -webkit-perspective: 100px;
+}
+
+#content {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transition: opacity 100ms, transform 100ms;
+    -webkit-transition: opacity 100ms, -webkit-transform 100ms ease-in-out;
+}
+#content.just-loaded {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 15px, -5px);
+}
+#content.move-out {
+    opacity: 0;
+    -webkit-transform: translate3d(0, -20px, 5px);
+}
+
+.alert {
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-transition: opacity 300ms, -webkit-transform 400ms ease-out;
+}
+.alert:nth-child(4n+1) {
+    -webkit-transition-delay: 50ms;
+}
+.alert:nth-child(4n+2) {
+    -webkit-transition-delay: 150ms;
+}
+.alert:nth-child(4n+3) {
+    -webkit-transition-delay: 200ms;
+}
+.alert:nth-child(4n) {
+    -webkit-transition-delay: 250ms;
+}
+.alert.message-out {
+    -webkit-transform: translate3d(-200%, 0, 0);
+}
+.alert.message-leave {
+    -webkit-transform: translate3d(200%, 0, 0);
+    -webkit-transition-delay: 0;
+    -webkit-transition: opacity 300ms, -webkit-transform 400ms ease-in;
+    opacity: 0;
+}
+
+

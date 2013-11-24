@@ -70,12 +70,10 @@ html
                     a(href="#{dir}/")
                         h1.navbar-brand TeaHarmony
                 .navbar-right
-                    p.navbar-text
-                        if user
+                    if user
+                        span.navbar-text
                             | Welcome,&nbsp;
                             span.text-info: a(href="#{dir}/user")= user.name
-                        else if path == '/register'
-                            | Already a member?
 
                     a(href="#{dir}/help").btn.btn-link.navbar-btn Help
 
@@ -92,17 +90,19 @@ html
                                 a.btn.btn-default.navbar-btn(href="#{dir}/register") Register
                             a#login.btn.btn-default.navbar-btn(href="#{dir}/login") Log In
 
-            if messages
-                - for (i in messages)
-                - var message = messages[i]
-                    if message.type
-                        .alert(class="alert-#{message.type}")
-                            p= message.content
-                    else
-                        .alert.alert-warning
-                            p= message
+            .messages
+                if messages
+                    - for (i in messages)
+                    - var message = messages[i]
+                        if message.type
+                            .alert(class="alert-#{message.type}").message-out
+                                p= message.content
+                        else
+                            .alert.alert-warning.message-out
+                                p= message
 
-            block content
+            #content.just-loaded
+                block content
 
             script(src="http://code.jquery.com/jquery-1.10.1.min.js")
             script(src='/javascripts/bootstrap.min.js')
