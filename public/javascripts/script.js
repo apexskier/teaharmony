@@ -21,7 +21,6 @@ $(document).ready(function() {
     $('#content').removeClass('just-loaded');
     $('.alert').removeClass('message-out');
     $('a').click(function(e) {
-        $('#content').addClass('move-out');
         $('.alert').addClass('message-leave');
     });
 });
