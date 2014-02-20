@@ -70,7 +70,7 @@ var site = {
     },
     default_ctx: {
     },
-    url: "http://glacier.camlittle.com:3000",
+    url: "http://wwubrew.com",
     home_dir: '/matches',
     email_re: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     validEmail: function(email) {
