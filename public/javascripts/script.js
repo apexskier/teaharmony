@@ -13,7 +13,7 @@ $(document).ready(function() {
             $('input[name="username"]').focus();
         });
     });
-    $('form').on('submit', function(e) {
+    $('form').not('#mc-embedded-subscribe-form').on('submit', function(e) {
         $(this).find('button[type="submit"]').prop('disabled', true);
         $('#content').addClass('move-out');
         $('.alert').addClass('message-leave');

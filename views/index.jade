@@ -3,7 +3,7 @@ extends layout
 block content
     h2.text-center Welcome to TeaHarmony
 
-    p.lead.text-center TeaHarmony is a website for exchanging all sorts of
+    p.lead.text-center TeaHarmony is WWU Brewing Club's website: for exchanging all sorts of
         | things in Bellingham, WA at WWU.
 
     .row
@@ -12,6 +12,30 @@ block content
 
     br
 
-    img.text-center.img-responsive.img-rounded(src="/img/kaylee_brew.jpg")
+    .row
+        .col-md-9
+            img.text-center.img-responsive.img-rounded(src="/img/kaylee_brew.jpg")
+        .col-md-3
+            #mc_embed_signup
+                form#mc-embedded-subscribe-form.validate(action='http://wwubrew.us3.list-manage.com/subscribe/post?u=2193a027d63134066a82946f5&id=f0274a8942', method='post', name='mc-embedded-subscribe-form', target='_blank', novalidate='')
+                    h3 Get emails about Brewing Club!
+                    .form-group
+                        label.hidden(for='mce-EMAIL') Email Address
+                        input#mce-EMAIL.required.email.form-control.input-sm(type='email', value='', name='EMAIL', placeholder="email address")
+                    .form-group
+                        label.hidden(for='mce-FNAME') First Name
+                        input#mce-FNAME.form-control.input-sm(type='text', value='', name='FNAME', placeholder="First Name")
+                    .form-group
+                        label.hidden(for='mce-LNAME') Last Name
+                        input#mce-LNAME.form-control.input-sm(type='text', value='', name='LNAME', placeholder="Last Name")
+                    #mce-responses.clear
+                    #mce-error-response.response(style='display:none')
+                    #mce-success-response.response(style='display:none')
+                    // real people should not fill this in and expect good things - do not remove this or risk form bot signups
+                    div(style='position: absolute; left: -5000px;')
+                        input(type='text', name='b_2193a027d63134066a82946f5_f0274a8942', tabindex='-1', value='')
+                    .clear
+                        input#mc-embedded-subscribe.button.btn.btn-default(type='submit', value='Subscribe!', name='subscribe')
+            br
 
-
+    br
