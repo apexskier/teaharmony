@@ -20,7 +20,7 @@ var app = express();
 
 // all environments
 app.set('env', process.env.ENV || 'development');
-app.set('port', (process.env.PORT || (process.env.ENV == 'live' ? 80 : 3000))); // set port to specified port number, 80 if env is live, or 3000 otherwise
+app.set('port', 3001); // set port to specified port number, 80 if env is live, or 3000 otherwise
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.use(express.favicon());
